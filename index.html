@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Análisis Numérico - Propagación de Error</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1, h2 {
+      color: #004d66;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #0077b6;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      margin-top: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #005f86;
+    }
+    .resultado {
+      margin-top: 12px;
+      font-weight: bold;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <h1>Resolución de Problemas - Análisis Numérico</h1>
+
+  <!-- Problema 32 -->
+  <div class="card">
+    <h2>Problema 32: Desintegración radiactiva del Carbono-14</h2>
+    <p>
+      Se conoce que el Carbono-14 tiene una vida media de 5730 años. 
+      En una muestra queda el 77.45% del carbono original. 
+      Calcular la edad estimada de la huella.
+    </p>
+    <button onclick="resolverCarbono()">Calcular Edad</button>
+    <div class="resultado" id="resultadoCarbono"></div>
+  </div>
+
+  <!-- Problema 36 -->
+  <div class="card">
+    <h2>Problema 36: Ley de enfriamiento de Newton</h2>
+    <p>
+      Un cuerpo se mide a las 9:18 PM y tiene 79.52 °F. 
+      Una hora después, 78.0 °F. 
+      Temperatura ambiente: 69 °F. 
+      Temperatura normal del cuerpo: 98.6 °F. 
+      Determinar la hora aproximada de la muerte.
+    </p>
+    <button onclick="resolverEnfriamiento()">Calcular Hora de Muerte</button>
+    <div class="resultado" id="resultadoEnfriamiento"></div>
+  </div>
+
+  <script>
+    // --------------------
+    // Problema 32 - Carbono 14
+    // --------------------
+    function resolverCarbono() {
+      const vidaMedia = 5730;
+      const porcentaje = 0.7745; // 77.45%
+
+      // 1. Calcular k con la vida media: 0.5 = e^(k*5730)
+      const k = Math.log(0.5) / vidaMedia;
+
+      // 2. Resolver para t: f(t)/f(0) = e^(k*t) = 0.7745
+      const t = Math.log(porcentaje) / k;
+
+      document.getElementById("resultadoCarbono").innerHTML =
+        `La edad estimada de la huella es de <b>${Math.round(t)}</b> años.`;
+    }
+
+    // --------------------
+    // Problema 36 - Ley de enfriamiento
+    // --------------------
+    function resolverEnfriamiento() {
+      const T_amb = 69;
+      const T0 = 79.52;  // primera medición
+      const T1 = 78.0;   // segunda medición (1 hora después)
+      const T_normal = 98.6;
+
+      // 1. Calcular k usando las dos mediciones
+      // (T1 - T_amb)/(T0 - T_amb) = e^(-k*1)
+      const k = -Math.log((T1 - T_amb) / (T0 - T_amb));
+
+      // 2. Calcular el tiempo transcurrido desde la muerte hasta la primera medición
+      // (T0 - T_amb) / (T_normal - T_amb) = e^(-k*t)
+      const t = -Math.log((T0 - T_amb) / (T_normal - T_amb)) / k;
+
+      // 3. Convertir tiempo a horas y minutos
+      const horas = Math.floor(t);
+      const minutos = Math.round((t - horas) * 60);
+
+      // 4. Hora de medición fue 9:18 PM -> restamos t
+      let hora = 21;  // 9 PM en formato 24h
+      let minuto = 18;
+
+      // Convertir a minutos totales
+      let totalMinutos = hora * 60 + minuto;
+      totalMinutos -= (horas * 60 + minutos);
+
+      if (totalMinutos < 0) totalMinutos += 24 * 60; // por si pasa al día anterior
+
+      const horaFinal = Math.floor(totalMinutos / 60);
+      const minutoFinal = totalMinutos % 60;
+
+      // Formato AM/PM
+      let sufijo = "AM";
+      let hora12 = horaFinal;
+      if (hora12 >= 12) {
+        sufijo = "PM";
+        if (hora12 > 12) hora12 -= 12;
+      }
+      if (hora12 === 0) hora12 = 12;
+
+      document.getElementById("resultadoEnfriamiento").innerHTML =
+        `La hora estimada de la muerte es aproximadamente a las 
+        <b>${hora12}:${minutoFinal.toString().padStart(2, "0")} ${sufijo}</b>.`;
+    }
+  </script>
+</body>
+</html>
